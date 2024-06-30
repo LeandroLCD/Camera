@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.net.InetAddress
 
-internal class OnvifDiscoveryManagerImpl(context: Context): OnvifDiscoveryManager {
+class OnvifDiscoveryManagerImpl(context: Context): OnvifDiscoveryManager {
     private val wifiManager =
         context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
    private val socketListener = AndroidSocketListener(wifiManager)
@@ -56,3 +56,4 @@ internal class OnvifDiscoveryManagerImpl(context: Context): OnvifDiscoveryManage
             .onCompletion { job.cancel() }
     }
 }
+

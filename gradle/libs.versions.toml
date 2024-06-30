@@ -1,0 +1,94 @@
+[versions]
+agp = "8.3.1"
+atomicfu = "0.23.2"
+kotlin = "2.0.0"
+coreKtx = "1.13.1"
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+kotlinxCollectionsImmutable = "0.3.7"
+ktorClientAuth = "2.3.8"
+ktorClientCio = "2.3.4"
+ktorClientCore = "2.3.8"
+ktorClientLogging = "2.3.8"
+ksp = "2.0.0-1.0.22"
+lifecycleRuntimeKtx = "2.8.2"
+runtimeLivedata = "1.6.8"
+activityCompose = "1.9.0"
+composeBom = "2024.06.00"
+lighthouse = "0.2.0"
+serialization = "0.86.3"
+serialutil = "0.86.3"
+appcompat = "1.7.0"
+hilt = "2.51.1"
+voyager = "1.1.0-beta02"
+room = "2.6.1"
+material = "1.12.0"
+
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+
+atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
+androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "runtimeLivedata" }
+androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+#compose
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core" }
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktorClientAuth" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClientCio" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClientLogging" }
+lighthouse = { module = "com.seanproctor:lighthouse", version.ref = "lighthouse" }
+serialization = { module = "io.github.pdvrieze.xmlutil:serialization", version.ref = "serialization" }
+serialutil = { module = "io.github.pdvrieze.xmlutil:serialutil", version.ref = "serialutil" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+
+#hild
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
+#Room
+android-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+android-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+android-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+
+#Voyager
+navigator = { group = "cafe.adriel.voyager", name = "voyager-navigator", version.ref = "voyager"}
+screen = { group = "cafe.adriel.voyager", name = "voyager-screenmodel", version.ref = "voyager"}
+transitions = { group = "cafe.adriel.voyager", name = "voyager-transitions", version.ref = "voyager"}
+voyager-hilt = { group = "cafe.adriel.voyager", name = "voyager-hilt", version.ref = "voyager"}
+
+#Test
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+
+[bundles]
+materialMobile = ["androidx-ui", "androidx-ui-graphics", "androidx-ui-tooling", "androidx-ui-tooling-preview", "androidx-material3", "androidx-material-icons-core", "androidx-material-icons-extended"]
+ktorClient = ["ktor-client-core", "ktor-client-cio", "ktor-client-auth", "ktor-client-logging", "atomicfu"]
+serializationXml = ["serialization", "serialutil"]
+voyagerNavigator = ["navigator", "screen", "transitions", "voyager-hilt"]
+lifecycle = ["androidx-runtime-livedata", "androidx-lifecycle-process", "androidx-lifecycle-runtime-ktx"]
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
