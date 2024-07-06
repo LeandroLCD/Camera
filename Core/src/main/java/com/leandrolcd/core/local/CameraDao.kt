@@ -1,13 +1,13 @@
 package com.leandrolcd.core.local
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.leandrolcd.core.local.Entities.DeviceEntity
 import kotlinx.coroutines.flow.Flow
+
 
 @Dao
 interface CameraDao {

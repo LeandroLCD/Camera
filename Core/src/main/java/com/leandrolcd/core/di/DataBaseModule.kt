@@ -14,13 +14,15 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class DataBaseModule {
+
+    @Singleton
     @Provides
     fun provideCameraDao(database: CameraDataBase): CameraDao {
         return database.cameraDao()
     }
 
-    @Provides
     @Singleton
+    @Provides
     fun provideTodoDatabase(@ApplicationContext appContext: Context): CameraDataBase {
         return Room.databaseBuilder(appContext, CameraDataBase::class.java, "Database")
             .fallbackToDestructiveMigration()
