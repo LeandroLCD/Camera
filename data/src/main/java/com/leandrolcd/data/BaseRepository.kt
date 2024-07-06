@@ -1,7 +1,6 @@
 package com.leandrolcd.data
 
 import android.annotation.SuppressLint
-import com.leandrolcd.data.models.ResultType
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
@@ -12,16 +11,11 @@ open class BaseRepository constructor(
     @SuppressLint("DiscouragedApi")
     suspend fun <T> makeNetworkCall(
         call: suspend CoroutineScope.() -> T
-    ): ResultType<T> {
+    ): Result<T> {
         return withContext(dispatchers) {
-            try {
-                ResultType.Success(call())
+            runCatching {
+                call()
             }
-            catch (e: Exception) {
-                return@withContext ResultType.Error(e.message.orEmpty())
-
-            }
-
         }
     }
 

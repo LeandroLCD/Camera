@@ -1,25 +1,50 @@
 package com.leandrolcd.onvifcamera.soap
 
-import kotlinx.serialization.Serializable
-import nl.adaptivity.xmlutil.serialization.XmlElement
-import nl.adaptivity.xmlutil.serialization.XmlSerialName
+import org.simpleframework.xml.Element
+import org.simpleframework.xml.Namespace
+import org.simpleframework.xml.Root
 
-@Serializable
-@XmlSerialName("GetDeviceInformationResponse", "http://www.onvif.org/ver10/device/wsdl", "tds")
-internal class GetDeviceInformationResponse(
-    @XmlElement(true)
-    @XmlSerialName("Manufacturer", "http://www.onvif.org/ver10/device/wsdl", "tds")
-    val manufacturer: String,
-    @XmlElement(true)
-    @XmlSerialName("Model", "http://www.onvif.org/ver10/device/wsdl", "tds")
-    val model: String,
-    @XmlElement(true)
-    @XmlSerialName("FirmwareVersion", "http://www.onvif.org/ver10/device/wsdl", "tds")
-    val firmwareVersion: String,
-    @XmlElement(true)
-    @XmlSerialName("SerialNumber", "http://www.onvif.org/ver10/device/wsdl", "tds")
-    val serialNumber: String,
-    @XmlElement(true)
-    @XmlSerialName("HardwareId", "http://www.onvif.org/ver10/device/wsdl", "tds")
-    val hardwareId: String,
+
+@Root(name = "Envelope", strict = false)
+@Namespace(reference = "http://www.w3.org/2003/05/soap-envelope", prefix = "s")
+data class ServiceInformationEnvelope(
+
+    @field:Element(name = "Body", required = true)
+    var body: ServiceInformationBody? = null
+)
+
+@Root(name = "Body", strict = false)
+data class ServiceInformationBody(
+    @field:Element(name = "GetDeviceInformationResponse", required = false)
+    @field:Namespace(reference = "http://schemas.xmlsoap.org/ws/2005/04/discovery", prefix = "d")
+    var service: GetDeviceInformationResponse? = null
+)
+@Root(name = "GetDeviceInformationResponse", strict = false)
+@Namespace(reference = "http://www.onvif.org/ver10/device/wsdl", prefix = "tds")
+class GetDeviceInformationResponse(
+
+    @field:Element(name = "Manufacturer", required = true)
+    @param:Element(name = "Manufacturer", required = true)
+    @Namespace(reference = "http://www.onvif.org/ver10/device/wsdl", prefix = "tds")
+    var manufacturer: String = "",
+
+    @field:Element(name = "Model", required = true)
+    @param:Element(name = "Model", required = true)
+    @Namespace(reference = "http://www.onvif.org/ver10/device/wsdl", prefix = "tds")
+    var model: String = "",
+
+    @field:Element(name = "FirmwareVersion", required = true)
+    @param:Element(name = "FirmwareVersion", required = true)
+    @Namespace(reference = "http://www.onvif.org/ver10/device/wsdl", prefix = "tds")
+    var firmwareVersion: String = "",
+
+    @field:Element(name = "SerialNumber", required = true)
+    @param:Element(name = "SerialNumber", required = true)
+    @Namespace(reference = "http://www.onvif.org/ver10/device/wsdl", prefix = "tds")
+    var serialNumber: String = "",
+
+    @field:Element(name = "HardwareId", required = true)
+    @param:Element(name = "HardwareId", required = true)
+    @Namespace(reference = "http://www.onvif.org/ver10/device/wsdl", prefix = "tds")
+    var hardwareId: String = ""
 )

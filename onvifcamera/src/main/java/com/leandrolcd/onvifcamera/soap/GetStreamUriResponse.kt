@@ -1,39 +1,75 @@
 package com.leandrolcd.onvifcamera.soap
 
-import nl.adaptivity.xmlutil.serialization.XmlElement
-import nl.adaptivity.xmlutil.serialization.XmlSerialName
-import kotlinx.serialization.Serializable
+import org.simpleframework.xml.Element
+import org.simpleframework.xml.Namespace
+import org.simpleframework.xml.Root
 
-@Serializable
-@XmlSerialName("GetStreamUriResponse", "http://www.onvif.org/ver20/media/wsdl", "tr2")
-internal class GetStreamUriResponse(
-    @XmlElement(true)
-    @XmlSerialName("Uri", "http://www.onvif.org/ver20/media/wsdl", "tr2")
-    val uri: String
+
+@Root(name = "Envelope", strict = false)
+@Namespace(reference = "http://www.w3.org/2003/05/soap-envelope", prefix = "s")
+data class StreamUriEnvelope(
+    @field:Element(name = "Body", required = true)
+    var body: StreamUriBody
 )
-@Serializable
-@XmlSerialName("GetStreamUriResponse", "http://www.onvif.org/ver10/media/wsdl", "trt")
-internal data class GetStreamMediaUriResponse(
-    @XmlElement(true)
-    @XmlSerialName("MediaUri", "http://www.onvif.org/ver10/media/wsdl", "trt")
-    val mediaUri: MediaUri
+
+@Root(name = "Body", strict = false)
+data class StreamUriBody(
+    @field:Element(name= "GetStreamUriResponse", required = false)
+    var content: GetStreamUriResponse
 )
-@Serializable
-@XmlSerialName("MediaUri", "http://www.onvif.org/ver10/media/wsdl", "trt")
-internal data class MediaUri(
-    @XmlElement(true)
-    @XmlSerialName("Uri", "http://www.onvif.org/ver10/schema", "tt")
-    val uri: String,
+@Root(name = "GetStreamUriResponse", strict = false)
+@Namespace(reference = "http://www.onvif.org/ver20/media/wsdl", prefix = "tr2")
+class GetStreamUriResponse(
 
-    @XmlElement(true)
-    @XmlSerialName("InvalidAfterConnect", "http://www.onvif.org/ver10/schema", "tt")
-    val invalidAfterConnect: Boolean,
+    @field:Element(name = "Uri", required = true)
+    @param:Element(name = "Uri", required = true)
+    @Namespace(reference = "http://www.onvif.org/ver20/media/wsdl", prefix = "tr2")
+    var uri: String = ""
+)
 
-    @XmlElement(true)
-    @XmlSerialName("InvalidAfterReboot", "http://www.onvif.org/ver10/schema", "tt")
-    val invalidAfterReboot: Boolean,
+@Root(name = "Envelope", strict = false)
+@Namespace(reference = "http://www.w3.org/2003/05/soap-envelope", prefix = "s")
+data class StreamMediaEnvelope(
+    @field:Element(name = "Body", required = true)
+    var body: StreamMediaBody
+)
 
-    @XmlElement(true)
-    @XmlSerialName("Timeout", "http://www.onvif.org/ver10/schema", "tt")
-    val timeout: String
+@Root(name = "Body", strict = false)
+data class StreamMediaBody(
+    @field:Element(name= "GetStreamUriResponse", required = false)
+    var content: GetStreamMediaUriResponse
+)
+@Root(name = "GetStreamUriResponse", strict = false)
+@Namespace(reference = "http://www.onvif.org/ver10/media/wsdl", prefix = "trt")
+data class GetStreamMediaUriResponse(
+
+    @field:Element(name = "MediaUri", required = true)
+    @param:Element(name = "MediaUri", required = true)
+    @Namespace(reference = "http://www.onvif.org/ver10/media/wsdl", prefix = "trt")
+    var mediaUri: MediaUri = MediaUri()
+)
+
+@Root(name = "MediaUri", strict = false)
+@Namespace(reference = "http://www.onvif.org/ver10/media/wsdl", prefix = "trt")
+data class MediaUri(
+
+    @field:Element(name = "Uri", required = true)
+    @param:Element(name = "Uri", required = true)
+    @Namespace(reference = "http://www.onvif.org/ver10/schema", prefix = "tt")
+    var uri: String = "",
+
+    @field:Element(name = "InvalidAfterConnect", required = true)
+    @param:Element(name = "InvalidAfterConnect", required = true)
+    @Namespace(reference = "http://www.onvif.org/ver10/schema", prefix = "tt")
+    var invalidAfterConnect: Boolean = false,
+
+    @field:Element(name = "InvalidAfterReboot", required = true)
+    @param:Element(name = "InvalidAfterReboot", required = true)
+    @Namespace(reference = "http://www.onvif.org/ver10/schema", prefix = "tt")
+    var invalidAfterReboot: Boolean = false,
+
+    @field:Element(name = "Timeout", required = true)
+    @param:Element(name = "Timeout", required = true)
+    @Namespace(reference = "http://www.onvif.org/ver10/schema", prefix = "tt")
+    var timeout: String = ""
 )

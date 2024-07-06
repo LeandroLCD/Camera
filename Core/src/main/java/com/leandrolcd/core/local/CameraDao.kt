@@ -13,10 +13,16 @@ import kotlinx.coroutines.flow.Flow
 interface CameraDao {
 
     @Query("SELECT * FROM device")
-    fun getDevices(): Flow<DeviceEntity>
+    fun getDevices(): Flow<List<DeviceEntity>>
 
     @Query("SELECT * FROM device WHERE id = :id")
     fun getDevice(id:Int): DeviceEntity?
+
+    @Query("SELECT * FROM device WHERE id = :id")
+    fun getDeviceFlow(id:Int): Flow<DeviceEntity>
+
+    @Query("SELECT * FROM device WHERE canal = :id")
+    fun getDeviceByChannel(id:Int): DeviceEntity?
 
     @Insert
     fun save(device: DeviceEntity)

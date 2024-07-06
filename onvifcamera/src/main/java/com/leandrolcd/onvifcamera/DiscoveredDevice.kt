@@ -1,6 +1,6 @@
 package com.leandrolcd.onvifcamera
 
-public data class DiscoveredOnvifDevice(
+data class DiscoveredOnvifDevice(
     val id: String,
     val types: List<String>,
     val scopes: List<String>,

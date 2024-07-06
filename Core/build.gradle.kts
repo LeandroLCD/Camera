@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.fir.analysis.forEachChildOfType
-
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -9,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.leandrolcd.core"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24

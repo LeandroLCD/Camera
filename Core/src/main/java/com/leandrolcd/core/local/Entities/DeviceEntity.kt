@@ -7,6 +7,8 @@ import androidx.room.PrimaryKey
 class DeviceEntity(
     @PrimaryKey(autoGenerate = true)
     val id:Int,
+    val serial:String,
+    val alias:String,
     val canal:Int,
     val user:String,
     val password:String,

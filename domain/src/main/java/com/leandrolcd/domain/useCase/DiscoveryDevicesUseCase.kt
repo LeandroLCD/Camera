@@ -12,4 +12,5 @@ class DiscoveryDevicesUseCase @Inject constructor(private val repository: IDisco
         return repository.discoveryDevices()
     }
 
+
 }

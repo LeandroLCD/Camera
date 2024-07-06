@@ -5,8 +5,11 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface IDeviceRepository {
+    suspend fun getDeviceByChannel(id: Int):Device?
 
-    suspend fun getDeviceList(): Flow<Device>
+    fun getDeviceById(id:Int):Flow<Device>
+
+    fun getDeviceList(): Flow<List<Device>>
 
     fun deleteDevice(device: Device)
 

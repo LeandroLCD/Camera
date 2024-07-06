@@ -1,5 +1,6 @@
 package com.leandrolcd.onvifcamera
 
+import android.util.Log
 import com.leandrolcd.onvifcamera.OnvifCommands.deviceInformationCommand
 import com.leandrolcd.onvifcamera.OnvifCommands.getSnapshotURICommand
 import com.leandrolcd.onvifcamera.OnvifCommands.getStreamURICommand
@@ -46,7 +47,11 @@ class OnvifDevice internal constructor(
 
      suspend fun getProfiles(): List<MediaProfile> {
         val endpoint = getEndpointForRequest(OnvifRequestType.GetProfiles)
+
+         Log.d("CameraViewModel", "endpoint: $endpoint")
         val response = execute(endpoint, profilesCommand, username, password, debug)
+
+         Log.d("CameraViewModel", "response: $response")
         return parseOnvifProfiles(response)
     }
 

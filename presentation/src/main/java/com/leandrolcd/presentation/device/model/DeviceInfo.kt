@@ -1,3 +1,3 @@
 package com.leandrolcd.presentation.device.model
 
-data class DeviceInfo (val friendlyName: String?, val serial: String, val host: String)
+data class DeviceInfo (val username: String?, val serial: String, val host: String)

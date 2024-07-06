@@ -1,79 +1,58 @@
 package com.leandrolcd.data.repositories
 
-import com.ivanempire.lighthouse.LighthouseClient
 import com.leandrolcd.core.di.DispatchersIO
 import com.leandrolcd.data.dto.OnvifCachedDevice
 import com.leandrolcd.domain.models.DeviceInformation
 import com.leandrolcd.domain.useCase.IDiscoveryManagerRepository
+import com.leandrolcd.onvifcamera.DiscoveredOnvifDevice
 import com.leandrolcd.onvifcamera.OnvifDevice
 import com.leandrolcd.onvifcamera.network.OnvifDiscoveryManager
 import io.ktor.http.Url
 import io.ktor.http.hostWithPort
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.flow.map
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 class DiscoveryManagerRepository @Inject constructor(
-    private val lighthouseClient: LighthouseClient,
     private val onvifDiscoveryManager: OnvifDiscoveryManager,
     @DispatchersIO private val dispatcher: CoroutineDispatcher
 ) : IDiscoveryManagerRepository {
 
+    private val cachedOnvifDevices = ConcurrentHashMap<String, OnvifCachedDevice>()
 
-    override fun discoveryDevices(): Flow<List<DeviceInformation>> = flow {
-        val cachedOnvifDevices = mutableMapOf<String, OnvifCachedDevice>()
-        val friendlyNameMap = mutableMapOf<String, String>()
+    override fun discoveryDevices(): Flow<List<DeviceInformation>> =
+        onvifDiscoveryManager
+            .discoverDevices( 2)
+            .map { devices ->
+                devices.mapNotNull { device -> mapToDeviceInformation(device) }
+            }
+            .flowOn(dispatcher)
 
-        combine(
-            onvifDiscoveryManager.discoverDevices(2),
-            lighthouseClient.discoverDevices(),
-        ) { onvifDevices, ssdpDevices ->
-            onvifDevices.mapNotNull { onvifDevice ->
-                var friendlyName = "admin"
-                val cachedOnvifDevice = cachedOnvifDevices[onvifDevice.id]
-                val endpoint = cachedOnvifDevice?.endpoint
-                    ?: onvifDevice.addresses
-                        .firstOrNull { OnvifDevice.isReachableEndpoint(it) }
-                        ?.also { endpoint ->
-                            cachedOnvifDevices[onvifDevice.id] =
-                                OnvifCachedDevice(
-                                    onvifDevice.addresses.map { Url(it).host },
-                                    endpoint
-                                )
-                        }
-                    ?: return@mapNotNull null
-                val ssdpFriendlyName = friendlyNameMap.getOrElse(onvifDevice.id) {
-                    ssdpDevices.firstNotNullOfOrNull { ssdpDevice ->
-                        if (onvifDevice.addresses.any { Url(it).host == ssdpDevice.location.host }) {
-                            val detailedDevice = lighthouseClient.retrieveDescription(ssdpDevice)
-                            friendlyNameMap[onvifDevice.id] = detailedDevice.friendlyName
-                            detailedDevice.friendlyName
-                        } else {
-                            null
-                        }
-                    }
-                }
-                if (ssdpFriendlyName != null) {
-                    friendlyName = ssdpFriendlyName
-                }
-                val url = Url(endpoint)
-                DeviceInformation(friendlyName,
-                    onvifDevice.id.removePrefix("urn:uuid:").substringBeforeLast('-'),
-                    url.hostWithPort)
+
+    private suspend fun mapToDeviceInformation(device: DiscoveredOnvifDevice): DeviceInformation? {
+        val cached = cachedOnvifDevices[device.id]
+
+        val endpoint = cached?.endpoint
+            ?: resolveReachableEndpoint(device)?.also { resolved ->
+                cachedOnvifDevices[device.id] = OnvifCachedDevice(
+                    hosts = device.addresses.map { Url(it).host },
+                    endpoint = resolved
+                )
             }
-        }
-            .collect {
-                emit(it)
-            }
+            ?: return null
+
+        val url = Url(endpoint)
+        return DeviceInformation(
+            username = "admin",
+            serial = device.id.removePrefix("urn:uuid:").substringBeforeLast('-'),
+            host = url.hostWithPort
+        )
     }
-        .flowOn(dispatcher)
 
-
+    private suspend fun resolveReachableEndpoint(device: DiscoveredOnvifDevice): String? {
+        return device.addresses.firstOrNull { OnvifDevice.isReachableEndpoint(it) }
+    }
 }

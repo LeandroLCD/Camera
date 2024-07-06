@@ -1,13 +1,28 @@
 package com.leandrolcd.onvifcamera.soap
 
-import kotlinx.serialization.Serializable
-import nl.adaptivity.xmlutil.serialization.XmlElement
-import nl.adaptivity.xmlutil.serialization.XmlSerialName
+import org.simpleframework.xml.Element
+import org.simpleframework.xml.Namespace
+import org.simpleframework.xml.Root
 
-@Serializable
-@XmlSerialName("GetSnapshotUriResponse", "http://www.onvif.org/ver20/media/wsdl", "tr2")
-internal class GetSnapshotUriResponse(
-    @XmlElement(true)
-    @XmlSerialName("Uri", "http://www.onvif.org/ver20/media/wsdl", "tr2")
-    val uri: String
+
+@Root(name = "Envelope", strict = false)
+@Namespace(reference = "http://www.w3.org/2003/05/soap-envelope", prefix = "s")
+data class SnapshotEnvelope(
+    @field:Element(name = "Body", required = true)
+    var body: SnapshotBody
+)
+
+@Root(name = "Body", strict = false)
+data class SnapshotBody(
+    @field:Element(name= "GetSnapshotUriResponse", required = false)
+    var content: GetStreamMediaUriResponse
+)
+
+@Root(name = "GetSnapshotUriResponse", strict = false)
+@Namespace(reference = "http://www.onvif.org/ver20/media/wsdl", prefix = "tr2")
+class GetSnapshotUriResponse(
+
+    @field:Element(name = "Uri", required = true)
+    @param:Element(name = "Uri", required = true)
+    var uri: String = ""
 )

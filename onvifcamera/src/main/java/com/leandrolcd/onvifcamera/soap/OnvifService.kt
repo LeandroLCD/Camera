@@ -1,17 +1,24 @@
 package com.leandrolcd.onvifcamera.soap
 
-import nl.adaptivity.xmlutil.serialization.XmlElement
-import nl.adaptivity.xmlutil.serialization.XmlSerialName
-import kotlinx.serialization.Serializable
+import org.simpleframework.xml.Element
+import org.simpleframework.xml.Namespace
+import org.simpleframework.xml.Root
 
-@Serializable
-@XmlSerialName("Service", "http://www.onvif.org/ver10/device/wsdl", "tds")
-internal class OnvifService(
-    @XmlElement(true)
-    @XmlSerialName("Namespace", "http://www.onvif.org/ver10/device/wsdl", "tds")
-    val namespace: String,
-    @XmlElement(true)
-    @XmlSerialName("XAddr", "http://www.onvif.org/ver10/device/wsdl", "tds")
-    val address: String,
-    val version: Version,
+@Root(name = "Service", strict = false)
+@Namespace(reference = "http://www.onvif.org/ver10/device/wsdl", prefix = "tds")
+class OnvifService(
+
+    @field:Element(name = "Namespace", required = true)
+    @param:Element(name = "Namespace", required = true)
+    @Namespace(reference = "http://www.onvif.org/ver10/device/wsdl", prefix = "tds")
+    var namespace: String = "",
+
+    @field:Element(name = "XAddr", required = true)
+    @param:Element(name = "XAddr", required = true)
+    @Namespace(reference = "http://www.onvif.org/ver10/device/wsdl", prefix = "tds")
+    var address: String = "",
+
+    @field:Element(name = "Version", required = true)
+    @param:Element(name = "Version", required = true)
+    var version: Version = Version()
 )
