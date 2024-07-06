@@ -1,82 +1,64 @@
-@file:Suppress("DEPRECATION")
-
 package com.leandrolcd.onvifcamera
 
-
-import com.leandrolcd.onvifcamera.soap.Envelope
-import com.leandrolcd.onvifcamera.soap.GetServicesResponse
+import android.util.Log
+import com.leandrolcd.onvifcamera.soap.ProbeEnvelope
 import com.leandrolcd.onvifcamera.soap.ProbeMatch
-import com.leandrolcd.onvifcamera.soap.ProbeMatches
-import com.leandrolcd.onvifcamera.soap.GetDeviceInformationResponse
-import com.leandrolcd.onvifcamera.soap.GetProfilesResponse
-import com.leandrolcd.onvifcamera.soap.GetSnapshotUriResponse
-import com.leandrolcd.onvifcamera.soap.GetStreamMediaUriResponse
-import com.leandrolcd.onvifcamera.soap.GetStreamUriResponse
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
-import kotlinx.serialization.serializer
-import nl.adaptivity.xmlutil.ExperimentalXmlUtilApi
-import nl.adaptivity.xmlutil.XmlDeclMode
-import nl.adaptivity.xmlutil.serialization.UnknownChildHandler
-import nl.adaptivity.xmlutil.serialization.XML
+import com.leandrolcd.onvifcamera.soap.ProfileEnvelope
+import com.leandrolcd.onvifcamera.soap.ServiceEnvelope
+import com.leandrolcd.onvifcamera.soap.ServiceInformationEnvelope
+import com.leandrolcd.onvifcamera.soap.SnapshotEnvelope
+import com.leandrolcd.onvifcamera.soap.StreamMediaEnvelope
+import com.leandrolcd.onvifcamera.soap.StreamUriEnvelope
+import org.simpleframework.xml.core.Persister
+import java.io.StringReader
 
-@OptIn(ExperimentalXmlUtilApi::class)
-private inline fun <reified T : Any> parseSoap(input: String): T {
-    val module = SerializersModule {
-        polymorphic(Any::class) {
-            subclass(T::class, serializer())
-        }
-    }
 
-    val xml = XML(module) {
-        xmlDeclMode = XmlDeclMode.Minimal
-        autoPolymorphic = true
-        unknownChildHandler = UnknownChildHandler { _, _, _, _, _ -> emptyList() }
-    }
-    val serializer = serializer<Envelope<T>>()
-
-    return xml.decodeFromString(serializer, input).data
+private inline fun <reified T : Any> parseSoap(xmlString: String): T {
+    val serializer = Persister()
+    return serializer.read(T::class.java, StringReader(xmlString))
 }
 
 internal fun parseOnvifProfiles(input: String): List<MediaProfile> {
-    val result = parseSoap<GetProfilesResponse>(input)
+    val result = parseSoap<ProfileEnvelope>(input).body?.content?.profiles ?: emptyList()
 
-    return result.profiles.map {
-        MediaProfile(it.name, it.token, it.encoder.encoding)
+    Log.d("CameraViewModel", "parseOnvifProfiles: $result")
+    return result.map {
+        MediaProfile(it.name.orEmpty(), it.token.orEmpty(), it.videoEncoderConfig?.encoding.orEmpty())
     }
 }
 
 internal fun parseOnvifStreamUri(input: String): String {
-  return  try {
-        parseSoap<GetStreamUriResponse>(input).uri
-    }catch (e: Exception){
-        parseSoap<GetStreamMediaUriResponse>(input = input).mediaUri.uri
+    return try {
+        parseSoap<StreamUriEnvelope>(input).body.content.uri
+    } catch (_: Exception) {
+        parseSoap<StreamMediaEnvelope>(xmlString = input).body.content.mediaUri.uri
     }
 
 }
 
 internal fun parseOnvifSnapshotUri(input: String): String {
-    val result = parseSoap<GetSnapshotUriResponse>(input)
+    val result = parseSoap<SnapshotEnvelope>(input).body.content.mediaUri
     return result.uri
 }
 
 internal fun parseOnvifServices(input: String): Map<String, String> {
-    return parseSoap<GetServicesResponse>(input).services.associate {
-        it.namespace to it.address
-    }
+    return parseSoap<ServiceEnvelope>(input).body?.service?.services?.associate {
+        it.namespace.toString() to it.xAddr.orEmpty()
+    } ?: emptyMap()
 }
 
-internal fun parseOnvifProbeResponse(input: String): List<ProbeMatch> {
-    return parseSoap<ProbeMatches>(input).matches
+internal fun parseOnvifProbeResponse(input: String): ProbeMatch? {
+    println(input)
+    return parseSoap<ProbeEnvelope>(input).body?.probeMatches?.matches?.firstOrNull()
 }
 
 internal fun parseOnvifDeviceInformation(input: String): OnvifDeviceInformation {
-    val result = parseSoap<GetDeviceInformationResponse>(input)
+    val result = parseSoap<ServiceInformationEnvelope>(input).body?.service
     return OnvifDeviceInformation(
-        manufacturer = result.manufacturer,
-        model = result.model,
-        firmwareVersion = result.firmwareVersion,
-        serialNumber = result.serialNumber,
-        hardwareId = result.hardwareId,
+        manufacturer = result?.manufacturer.orEmpty(),
+        model = result?.model.orEmpty(),
+        firmwareVersion = result?.firmwareVersion.orEmpty(),
+        serialNumber = result?.serialNumber.orEmpty(),
+        hardwareId = result?.hardwareId.orEmpty(),
     )
 }

@@ -1,5 +1,3 @@
-
-
 package com.leandrolcd.onvifcamera
 
 import io.ktor.client.plugins.auth.*
@@ -10,6 +8,8 @@ import io.ktor.http.*
 import io.ktor.http.auth.*
 import io.ktor.util.*
 import io.ktor.util.logging.*
+import io.ktor.utils.io.InternalAPI
+import io.ktor.utils.io.KtorDsl
 import io.ktor.utils.io.charsets.*
 import io.ktor.utils.io.core.*
 import kotlinx.atomicfu.*
@@ -17,7 +17,7 @@ import kotlinx.atomicfu.*
 /**
  * Installs the client's [DigestAuthProvider].
  */
-public fun Auth.customDigest(block: DigestAuthConfig.() -> Unit) {
+fun AuthConfig.customDigest(block: DigestAuthConfig.() -> Unit) {
     val config = DigestAuthConfig().apply(block)
     with(config) {
         this@customDigest.providers += CustomDigestAuthProvider(_credentials, realm, algorithmName)
@@ -29,26 +29,26 @@ public fun Auth.customDigest(block: DigestAuthConfig.() -> Unit) {
  */
 @Suppress("KDocMissingDocumentation")
 @KtorDsl
-public class DigestAuthConfig {
+class DigestAuthConfig {
 
-    public var algorithmName: String = "MD5"
+    var algorithmName: String = "MD5"
 
     /**
      * Required: The username of the basic auth.
      */
     @Deprecated("Please use `credentials {}` function instead")
-    public var username: String = ""
+    var username: String = ""
 
     /**
      * Required: The password of the basic auth.
      */
     @Deprecated("Please use `credentials {}` function instead")
-    public var password: String = ""
+    var password: String = ""
 
     /**
      * (Optional) Specifies the realm of the current provider.
      */
-    public var realm: String? = null
+    var realm: String? = null
 
     @Suppress("DEPRECATION")
     internal var _credentials: suspend () -> DigestAuthCredentials? = {
@@ -58,7 +58,7 @@ public class DigestAuthConfig {
     /**
      * Allows you to specify authentication credentials.
      */
-    public fun credentials(block: suspend () -> DigestAuthCredentials?) {
+    fun credentials(block: suspend () -> DigestAuthCredentials?) {
         _credentials = block
     }
 }
@@ -69,14 +69,14 @@ public class DigestAuthConfig {
  * You can learn more from [Digest authentication](https://ktor.io/docs/digest-client.html).
  */
 @Suppress("KDocMissingDocumentation")
-public class CustomDigestAuthProvider(
+class CustomDigestAuthProvider(
     private val credentials: suspend () -> DigestAuthCredentials?,
-    @Deprecated("This will become private") public val realm: String? = null,
-    @Deprecated("This will become private") public val algorithmName: String = "MD5",
+    @Deprecated("This will become private") val realm: String? = null,
+    @Deprecated("This will become private") val algorithmName: String = "MD5",
 ) : AuthProvider {
 
     @Deprecated("Consider using constructor with credentials provider instead")
-    public constructor(
+    constructor(
         username: String,
         password: String,
         realm: String? = null,
@@ -88,11 +88,11 @@ public class CustomDigestAuthProvider(
     )
 
     @Deprecated("This will be removed")
-    public val username: String
+    val username: String
         get() = error("Static username is not supported anymore")
 
     @Deprecated("This will be removed")
-    public val password: String
+    val password: String
         get() = error("Static username is not supported anymore")
 
     @Suppress("OverridingDeprecatedMember")

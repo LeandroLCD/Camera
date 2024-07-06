@@ -2,7 +2,6 @@ package com.leandrolcd.presentation.device
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.leandrolcd.domain.models.ResultTypeUiState
 import com.leandrolcd.domain.useCase.ConnectionDeviceUseCase
 import com.leandrolcd.domain.useCase.DiscoveryDevicesUseCase
 import com.leandrolcd.domain.useCase.SaveDeviceUseCase
@@ -11,7 +10,6 @@ import com.leandrolcd.presentation.device.model.DeviceInfo
 import com.leandrolcd.presentation.device.states.AddDeviceUiState
 import com.leandrolcd.presentation.device.states.DialogUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,12 +22,17 @@ import javax.inject.Inject
 class AddDeviceViewModel @Inject constructor(private val discoveryDevicesUseCase: DiscoveryDevicesUseCase,
     private val connectionDeviceUseCase: ConnectionDeviceUseCase,
     private val saveDeviceUseCase: SaveDeviceUseCase,
-    private val mapperDomain: MapperDomain):ViewModel() {
+    private val mapperDomain: MapperDomain
+):ViewModel() {
 
     private val _deviceList = MutableStateFlow<List<DeviceInfo>>(emptyList())
     val deviceList: StateFlow<List<DeviceInfo>>
         get() = _deviceList.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+
+    val isLoading: StateFlow<Boolean>
+        get() = _isLoading.asStateFlow()
 
     private val _dialogUiState = MutableStateFlow<DialogUiState>(DialogUiState.None)
 
@@ -49,9 +52,8 @@ class AddDeviceViewModel @Inject constructor(private val discoveryDevicesUseCase
         }
         jobDiscovery = viewModelScope.launch {
             discoveryDevicesUseCase().collect{devices->
-                val count = devices.size
                 _uiState.update {
-                    AddDeviceUiState.Discovering(count)
+                    AddDeviceUiState.Discovering(devices.size)
                 }
                 _deviceList.update {
                     devices.map {d->
@@ -61,9 +63,7 @@ class AddDeviceViewModel @Inject constructor(private val discoveryDevicesUseCase
             }
         }
         jobDiscovery?.invokeOnCompletion {
-            _uiState.update {
-                AddDeviceUiState.Loaded
-            }
+            _uiState.tryEmit(AddDeviceUiState.Loaded)
         }
     }
     fun retry(){
@@ -74,34 +74,40 @@ class AddDeviceViewModel @Inject constructor(private val discoveryDevicesUseCase
 
     fun stopDiscovery(){
         jobDiscovery?.cancel( )
-        _uiState.update {
-            AddDeviceUiState.Loaded
-        }
     }
 
-    fun connectDevice(host: String, user:String, password:String){
+    private fun connectDevice(host: String, user:String, password:String){
+        _isLoading.update {
+            true
+        }
         viewModelScope.launch{
-            when(val result = connectionDeviceUseCase(host,user,password)){
-                is ResultTypeUiState.Error -> {
-                    _uiState.update {
-                        AddDeviceUiState.Error(result.message)
-                    }
-                }
-                is ResultTypeUiState.Success -> {
-                    _dialogUiState.value = DialogUiState.None
-                    saveDeviceUseCase.invoke(result.toString(), 0)
-
-                }
+            connectionDeviceUseCase(host,user,password).onSuccess {
+                saveDeviceUseCase.invoke(it, 1)
+            }.onFailure {
+                _uiState.tryEmit(
+                    AddDeviceUiState.Error(it.localizedMessage.orEmpty())
+                )
             }
+            _dialogUiState.tryEmit(DialogUiState.None)
+            _isLoading.tryEmit(false)
         }
     }
 
     fun showDialogAddDevice(device:DeviceInfo){
         _dialogUiState.update{
-            DialogUiState.Show(url = device.host, user = device.friendlyName.orEmpty(), onDismiss = {
-                _dialogUiState.value = DialogUiState.None
+            DialogUiState.Show(url = device.host, user = device.username.orEmpty(), onDismiss = {
+                _dialogUiState.update {
+                    DialogUiState.None
+                }
             }){host, user, pass->
-                connectDevice(host, user, pass)
+                val url = buildString {
+                    if(!host.startsWith("http"))
+                        append("http://")
+                    append(host)
+                    if(!host.endsWith("/"))
+                        append("/")
+                }
+                connectDevice(url, user, pass)
             }
         }
     }
@@ -110,7 +116,14 @@ class AddDeviceViewModel @Inject constructor(private val discoveryDevicesUseCase
             DialogUiState.Show(onDismiss = {
                 _dialogUiState.value = DialogUiState.None
             }){host, user, pass->
-                connectDevice(host, user, pass)
+                val url = buildString {
+                    if(!host.startsWith("http"))
+                        append("http://")
+                    append(host)
+                    if(!host.endsWith("/"))
+                        append("/")
+                }
+                connectDevice(url, user, pass)
             }
         }
     }

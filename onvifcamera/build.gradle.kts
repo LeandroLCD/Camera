@@ -31,6 +31,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
     }
 }
 
@@ -45,8 +46,7 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
 
     implementation(libs.atomicfu)
-    implementation(libs.serialization)
-    implementation(libs.serialutil)
+    implementation(libs.bundles.serializationXml)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

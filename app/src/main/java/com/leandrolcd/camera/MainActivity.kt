@@ -8,7 +8,6 @@ import androidx.activity.enableEdgeToEdge
 import cafe.adriel.voyager.navigator.Navigator
 import com.leandrolcd.camera.ui.home.Home
 import com.leandrolcd.camera.ui.theme.CameraTheme
-import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

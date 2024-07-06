@@ -3,19 +3,17 @@ package com.leandrolcd.onvifcamera.network
 import android.net.wifi.WifiManager
 import android.util.Log
 import com.leandrolcd.onvifcamera.OnvifCommands
-import io.ktor.utils.io.core.toByteArray
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 import java.net.DatagramPacket
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.MulticastSocket
 import java.util.UUID
 
-/** Specific implementation of [SocketListener] */
 internal class AndroidSocketListener(
     private val wifiManager: WifiManager,
 ) : SocketListener {
@@ -32,56 +30,65 @@ internal class AndroidSocketListener(
         multicastLock.setReferenceCounted(true)
         multicastLock.acquire()
 
-        val multicastSocket = MulticastSocket(null)
-        multicastSocket.reuseAddress = true
-        multicastSocket.broadcast = true
-        multicastSocket.loopbackMode = true
+        val multicastSocket = MulticastSocket(null).apply {
+            reuseAddress = true
+            broadcast = true
+            loopbackMode = true
+            bind(InetSocketAddress(MULTICAST_PORT))
+        }
 
         try {
             multicastSocket.joinGroup(multicastAddress)
-            multicastSocket.bind(InetSocketAddress(MULTICAST_PORT))
             Log.d(TAG, "MulticastSocket has been setup")
         } catch (ex: Exception) {
-            Log.e(TAG, "Could finish setting up the multicast socket and group", ex)
+            Log.e(TAG, "Could not join multicast group", ex)
+            multicastSocket.close()
+            if (multicastLock.isHeld) multicastLock.release()
+            throw ex
         }
 
         return multicastSocket
     }
 
-    override fun listenForPackets(retryCount: Int): Flow<DatagramPacket> {
-        Log.d(TAG, "Setting up datagram packet flow")
+    override fun listenForPackets(retryCount: Int): Flow<DatagramPacket> = flow {
         val multicastSocket = setupSocket()
 
-        return flow {
-            multicastSocket.use {
-                val messageId = UUID.randomUUID()
-                val requestMessage = OnvifCommands.probeCommand(messageId.toString()).toByteArray()
-                val requestDatagram = DatagramPacket(requestMessage, requestMessage.size, multicastAddress, MULTICAST_PORT)
+        try {
+            val messageId = UUID.randomUUID()
+            val requestMessage = OnvifCommands.probeCommand(messageId.toString()).toByteArray()
+            val requestDatagram =
+                DatagramPacket(requestMessage, requestMessage.size, multicastAddress, MULTICAST_PORT)
 
-                repeat(retryCount) {
-                    multicastSocket.send(requestDatagram)
-                }
-
-                while (currentCoroutineContext().isActive) {
-                    val discoveryBuffer = ByteArray(MULTICAST_DATAGRAM_SIZE)
-                    val discoveryDatagram = DatagramPacket(discoveryBuffer, discoveryBuffer.size)
-                    it.receive(discoveryDatagram)
-                    emit(discoveryDatagram)
-                }
+            repeat(retryCount) {
+                multicastSocket.send(requestDatagram)
+                kotlinx.coroutines.delay(100)
             }
-        }.onCompletion { teardownSocket(multicastSocket) }
-    }
 
-    override fun teardownSocket(multicastSocket: MulticastSocket) {
-        Log.d(TAG, "Releasing resources")
-
-        if (multicastLock.isHeld) {
-            multicastLock.release()
+            val buffer = ByteArray(MULTICAST_DATAGRAM_SIZE)
+            while (currentCoroutineContext().isActive) {
+                val packet = DatagramPacket(buffer, buffer.size)
+                withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    if (multicastSocket.isClosed) {
+                        return@withContext
+                    }
+                    multicastSocket.receive(packet)
+                }
+                emit(packet)
+            }
+        } finally {
+            teardownSocket(multicastSocket)
         }
-
-        if (!multicastSocket.isClosed) {
-            multicastSocket.leaveGroup(multicastAddress)
-            multicastSocket.close()
+    }
+    override fun teardownSocket(multicastSocket: MulticastSocket) {
+        try {
+            if (!multicastSocket.isClosed) {
+                multicastSocket.leaveGroup(multicastAddress)
+                multicastSocket.close()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error releasing socket resources", e)
+        } finally {
+            if (multicastLock.isHeld) multicastLock.release()
         }
     }
 

@@ -8,7 +8,7 @@ class MapperDomain @Inject constructor() {
     fun toModel(device: DeviceInformation): DeviceInfo{
         return device.run {
             DeviceInfo(
-                friendlyName = friendlyName,
+                username = username,
                 serial = serial,
                 host = host
             )
