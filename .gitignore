@@ -1,4 +1,8 @@
-local.properties
+*.iml
+.gradle
+
+/.kotlin/
+/.idea/
 
 # Log/OS Files
 *.log
@@ -12,7 +16,6 @@ output.json
 
 # IntelliJ
 *.iml
-.idea/
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
