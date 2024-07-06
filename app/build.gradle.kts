@@ -36,11 +36,16 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
+    }
+    kotlin {
+        sourceSets.all {
+            languageSettings.enableLanguageFeature("ExplicitBackingFields")
+        }
     }
     buildFeatures {
         compose = true
@@ -51,6 +56,7 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/gradle/incremental.annotation.processors"
         }
     }
 }
@@ -63,13 +69,19 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.materialMobile)
     implementation(libs.bundles.voyagerNavigator)
+    implementation(libs.lottie)
 
-    //implementation (project(":domain"))
+    implementation (project(":presentation"))
+    implementation (project(":domain"))
+    implementation (project(":data"))
+    implementation (project(":core"))
 
     //hilt
+    implementation(libs.hilt.navigation.compose)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
+    testImplementation(platform(libs.androidx.compose.bom))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

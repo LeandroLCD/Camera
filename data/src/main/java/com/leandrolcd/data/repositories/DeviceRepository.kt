@@ -10,6 +10,7 @@ import javax.inject.Inject
 class DeviceRepository @Inject constructor(
     private val cameraDao: CameraDao
 ) : IDeviceRepository {
+
     override suspend fun getDeviceList() = cameraDao.getDevices().map {
         it.toModel()
     }
@@ -18,9 +19,9 @@ class DeviceRepository @Inject constructor(
        cameraDao.delete(device.id)
     }
 
-    override fun updateDevice(device: Device):Boolean{
+    override fun updateDevice(device: Device){
         val entity = cameraDao.getDevice(device.id)
-       return if(entity != null){
+        if(entity != null){
             val new = com.leandrolcd.core.local.Entities.DeviceEntity(
                 id = entity.id,
                 canal = device.canal,
@@ -30,8 +31,8 @@ class DeviceRepository @Inject constructor(
                 snapshot = device.snapshot
             )
             cameraDao.updateDevice(new)
-            true
-        }else false
+
+        }
 
     }
 

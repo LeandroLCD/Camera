@@ -8,23 +8,30 @@ import com.leandrolcd.domain.useCase.IDiscoveryManagerRepository
 import com.leandrolcd.domain.useCase.IOnvifDeviceRepository
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class RepositoryModule {
+ class RepositoryModule {
     @Singleton
-    @Binds
-    abstract fun bindsOnvifDevice(repository: OnvifDeviceRepository): IOnvifDeviceRepository
+    @Provides
+     fun bindsOnvifDevice(repository: OnvifDeviceRepository): IOnvifDeviceRepository{
+         return  repository
+     }
 
 
     @Singleton
-    @Binds
-    abstract fun bindsDevice(repository: DeviceRepository): IDeviceRepository
+    @Provides
+    fun bindsDevice(repository: DeviceRepository): IDeviceRepository{
+        return repository
+    }
 
     @Singleton
-    @Binds
-    abstract fun bindsDiscoveryDevices(repository: DiscoveryManagerRepository): IDiscoveryManagerRepository
+    @Provides
+    fun bindsDiscoveryDevices(repository: DiscoveryManagerRepository): IDiscoveryManagerRepository{
+        return repository
+    }
 }
