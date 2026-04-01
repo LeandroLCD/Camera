@@ -25,7 +25,7 @@ class DataBaseModule {
     @Provides
     fun provideTodoDatabase(@ApplicationContext appContext: Context): CameraDataBase {
         return Room.databaseBuilder(appContext, CameraDataBase::class.java, "Database")
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration(false)
             .build()
     }
 }
