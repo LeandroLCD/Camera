@@ -9,13 +9,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import com.leandrolcd.camera.ui.widgets.videoPlayer.VideoPlayer
 import com.leandrolcd.presentation.device.OneCameraViewModel
 
 
-class OneCamera(val deviceId: Int) :Screen{
+class OneCamera(val deviceId: Int) : Screen {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     override fun Content() {
@@ -24,21 +24,22 @@ class OneCamera(val deviceId: Int) :Screen{
         val streamUrl by viewModel.urlStream.collectAsState()
         LaunchedEffect(device) {
             viewModel.load(deviceId)
-            if(device!=null){
+            if (device != null) {
                 viewModel.connectDevice(device!!)
             }
         }
-        ConstraintLayout(modifier = Modifier.fillMaxSize()){
+        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
             val (camera) = createRefs()
             Box(modifier = Modifier.constrainAs(camera) {
                 top.linkTo(parent.top)
                 bottom.linkTo(parent.bottom)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
-            }){
-                VideoPlayer(video =streamUrl,
-                    title = device?.alias.orEmpty(), modifier = Modifier) {
-
+            }) {
+                VideoPlayer(
+                    video = streamUrl,
+                    title = device?.alias.orEmpty(), modifier = Modifier
+                ) {
 
 
                 }
