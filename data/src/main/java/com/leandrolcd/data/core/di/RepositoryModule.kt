@@ -6,7 +6,6 @@ import com.leandrolcd.data.repositories.OnvifDeviceRepository
 import com.leandrolcd.domain.useCase.IDeviceRepository
 import com.leandrolcd.domain.useCase.IDiscoveryManagerRepository
 import com.leandrolcd.domain.useCase.IOnvifDeviceRepository
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
