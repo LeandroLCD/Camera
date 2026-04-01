@@ -1,13 +1,13 @@
-package com.leandrolcd.core.local
+package com.leandrolcd.data.core.local
 
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.leandrolcd.core.local.Entities.DeviceEntity
+import com.leandrolcd.data.core.local.Entities.DeviceEntity
 
 @Database(
     entities = [DeviceEntity::class],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 abstract class CameraDataBase: RoomDatabase() {
     abstract fun cameraDao(): CameraDao

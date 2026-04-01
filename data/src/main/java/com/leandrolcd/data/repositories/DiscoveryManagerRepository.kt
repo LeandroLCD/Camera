@@ -1,6 +1,6 @@
 package com.leandrolcd.data.repositories
 
-import com.leandrolcd.core.di.DispatchersIO
+import com.leandrolcd.data.core.di.DispatchersIO
 import com.leandrolcd.data.dto.OnvifCachedDevice
 import com.leandrolcd.domain.models.DeviceInformation
 import com.leandrolcd.domain.useCase.IDiscoveryManagerRepository

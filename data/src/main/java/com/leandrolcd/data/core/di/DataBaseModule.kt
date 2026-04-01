@@ -1,9 +1,9 @@
-package com.leandrolcd.core.di
+package com.leandrolcd.data.core.di
 
 import android.content.Context
 import androidx.room.Room
-import com.leandrolcd.core.local.CameraDao
-import com.leandrolcd.core.local.CameraDataBase
+import com.leandrolcd.data.core.local.CameraDao
+import com.leandrolcd.data.core.local.CameraDataBase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

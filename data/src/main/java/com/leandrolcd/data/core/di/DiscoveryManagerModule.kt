@@ -1,4 +1,4 @@
-package com.leandrolcd.data.di
+package com.leandrolcd.data.core.di
 
 import android.content.Context
 import android.util.Log

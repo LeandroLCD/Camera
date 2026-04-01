@@ -1,4 +1,4 @@
-package com.leandrolcd.core.local.Entities
+package com.leandrolcd.data.core.local.Entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

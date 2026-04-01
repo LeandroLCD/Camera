@@ -1,4 +1,4 @@
-package com.leandrolcd.core.di
+package com.leandrolcd.data.core.di
 
 import dagger.Module
 import dagger.Provides

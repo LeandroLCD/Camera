@@ -1,13 +1,14 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "com.leandrolcd.data"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
@@ -25,12 +26,12 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
+
+}
+kotlin{
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
     }
 }
 
@@ -42,13 +43,20 @@ dependencies {
     implementation(libs.bundles.serializationXml)
     implementation(libs.lighthouse)
     implementation(project(":domain"))
-    implementation(project(":core"))
     implementation(project(":onvifcamera"))
+
+
 
     //hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.compiler)
     ksp(libs.hilt.compiler)
+
+    //Room
+    implementation(libs.android.room.runtime)
+    annotationProcessor(libs.android.room.compiler)
+    implementation(libs.android.room.ktx)
+    ksp(libs.android.room.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
