@@ -22,7 +22,6 @@ dependencyResolutionManagement {
 rootProject.name = "Camera"
 include(":app")
 include(":onvifcamera")
-include(":core")
 include(":data")
 include(":domain")
 include(":presentation")

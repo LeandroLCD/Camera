@@ -1,6 +1,8 @@
+import org.gradle.kotlin.dsl.assign
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
@@ -37,14 +39,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-    kotlin {
-        sourceSets.all {
-            languageSettings.enableLanguageFeature("ExplicitBackingFields")
-        }
-    }
+
     buildFeatures {
         compose = true
     }
@@ -53,6 +48,15 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "META-INF/gradle/incremental.annotation.processors"
         }
+    }
+}
+kotlin{
+    sourceSets.all {
+        languageSettings.enableLanguageFeature("ExplicitBackingFields")
+    }
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
     }
 }
 
@@ -75,7 +79,6 @@ dependencies {
     implementation (project(":presentation"))
     implementation (project(":domain"))
     implementation (project(":data"))
-    implementation (project(":core"))
 
     //hilt
     implementation(libs.hilt.navigation.compose)

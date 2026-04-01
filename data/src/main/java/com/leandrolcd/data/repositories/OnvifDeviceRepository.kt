@@ -1,8 +1,10 @@
 package com.leandrolcd.data.repositories
 
 import android.util.Log
-import com.leandrolcd.core.local.Entities.DeviceEntity
+import com.leandrolcd.data.core.local.Entities.DeviceEntity
 import com.leandrolcd.data.BaseRepository
+import com.leandrolcd.data.core.di.DispatchersIO
+import com.leandrolcd.data.core.local.CameraDao
 import com.leandrolcd.data.dto.DeviceDto
 import com.leandrolcd.domain.DeviceNotFoundException
 import com.leandrolcd.domain.models.Device
@@ -13,8 +15,8 @@ import java.net.URI
 import javax.inject.Inject
 
 class OnvifDeviceRepository @Inject constructor(
-    @com.leandrolcd.core.di.DispatchersIO dispatchers: CoroutineDispatcher,
-    private val cameraDao: com.leandrolcd.core.local.CameraDao
+    @DispatchersIO dispatchers: CoroutineDispatcher,
+    private val cameraDao: CameraDao
 ) : BaseRepository(dispatchers), IOnvifDeviceRepository {
 
     private val deviceMap = mutableMapOf<String, DeviceDto>()

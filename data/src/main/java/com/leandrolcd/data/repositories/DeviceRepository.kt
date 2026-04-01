@@ -1,7 +1,8 @@
 package com.leandrolcd.data.repositories
 
 import android.util.Log
-import com.leandrolcd.core.local.CameraDao
+import com.leandrolcd.data.core.local.CameraDao
+import com.leandrolcd.data.core.local.Entities.DeviceEntity
 import com.leandrolcd.data.mapping.toModel
 import com.leandrolcd.domain.models.Device
 import com.leandrolcd.domain.useCase.IDeviceRepository
@@ -46,7 +47,7 @@ class DeviceRepository @Inject constructor(
     override fun updateDevice(device: Device) {
         val entity = cameraDao.getDevice(device.id)
         if (entity != null) {
-            val new = com.leandrolcd.core.local.Entities.DeviceEntity(
+            val new = DeviceEntity(
                 id = entity.id,
                 serial = device.serial,
                 alias = device.alias,

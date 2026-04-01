@@ -21,8 +21,6 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HeaderValueParam
 import io.ktor.http.contentType
-import io.ktor.utils.io.core.use
-import io.ktor.utils.io.errors.IOException
 
 /**
  * @author Remy Virin on 04/03/2018.
@@ -76,11 +74,6 @@ class OnvifDevice internal constructor(
     }
 
      companion object {
-        private var logger: Logger? = null
-
-        fun setLogger(logger: Logger) {
-            Companion.logger = logger
-        }
 
         suspend fun requestDevice(
             url: String,
@@ -108,7 +101,8 @@ class OnvifDevice internal constructor(
                     }
                     return response.status.value in 200..299
                 }
-            } catch (e: IOException) {
+            } catch (e: kotlinx.io.IOException) {
+                e.printStackTrace()
                 return false
             }
         }

@@ -1,4 +1,4 @@
-package com.leandrolcd.data.di
+package com.leandrolcd.data.core.di
 
 import com.leandrolcd.data.repositories.DeviceRepository
 import com.leandrolcd.data.repositories.DiscoveryManagerRepository
